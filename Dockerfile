@@ -50,15 +50,24 @@ COPY frontend/nginx.conf /etc/nginx/conf.d/default.conf
 RUN chmod 755 /usr/share/nginx/html
 
 # Crear script de entrada
-RUN echo '#!/bin/sh' > /app/entrypoint.sh && \
-    echo 'set -e' >> /app/entrypoint.sh && \
-    echo 'echo "Iniciando Nginx..."' >> /app/entrypoint.sh && \
-    echo 'nginx -g "daemon off;" &' >> /app/entrypoint.sh && \
-    echo 'NGINX_PID=$!' >> /app/entrypoint.sh && \
-    echo 'echo "Iniciando Backend Node.js..."' >> /app/entrypoint.sh && \
-    echo 'cd /app/backend && npm start' >> /app/entrypoint.sh && \
-    chmod +x /app/entrypoint.sh
+RUN mkdir -p /app/scripts && \
+    echo '#!/bin/sh' > /app/scripts/entrypoint.sh && \
+    echo 'set -e' >> /app/scripts/entrypoint.sh && \
+    echo '' >> /app/scripts/entrypoint.sh && \
+    echo 'echo "========================================="' >> /app/scripts/entrypoint.sh && \
+    echo 'echo "Iniciando ASOCHINUF..."' >> /app/scripts/entrypoint.sh && \
+    echo 'echo "========================================="' >> /app/scripts/entrypoint.sh && \
+    echo '' >> /app/scripts/entrypoint.sh && \
+    echo 'echo "Iniciando Nginx en background..."' >> /app/scripts/entrypoint.sh && \
+    echo 'nginx -g "daemon off;" > /var/log/nginx/access.log 2>&1 &' >> /app/scripts/entrypoint.sh && \
+    echo 'NGINX_PID=$!' >> /app/scripts/entrypoint.sh && \
+    echo 'echo "Nginx PID: $NGINX_PID"' >> /app/scripts/entrypoint.sh && \
+    echo '' >> /app/scripts/entrypoint.sh && \
+    echo 'echo "Iniciando Backend Node.js en puerto 5001..."' >> /app/scripts/entrypoint.sh && \
+    echo 'cd /app/backend' >> /app/scripts/entrypoint.sh && \
+    echo 'npm start' >> /app/scripts/entrypoint.sh && \
+    chmod +x /app/scripts/entrypoint.sh
 
 EXPOSE 80
 
-CMD ["/app/entrypoint.sh"]
+CMD ["/app/scripts/entrypoint.sh"]
