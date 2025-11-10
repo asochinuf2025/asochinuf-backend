@@ -1,5 +1,4 @@
 import { neon, neonConfig } from '@neondatabase/serverless';
-import ws from 'ws';
 import dotenv from 'dotenv';
 
 // Solo cargar .env en desarrollo
@@ -7,14 +6,9 @@ if (process.env.NODE_ENV !== 'production') {
   dotenv.config();
 }
 
-// Configuración de Neon para WebSocket en serverless
-neonConfig.wsEndpoint = (host) => {
-  // Usar WebSocket para conexiones en Railway
-  return `wss://${host}/sql`;
-};
-
-// Usar ws como cliente WebSocket
-neonConfig.webSocketConstructor = ws;
+// Configuración de Neon para trabajar sin WebSocket (usar fetch)
+// En Railway, esto evita problemas con ws
+neonConfig.wsEndpoint = false;
 
 // Verificar que DATABASE_URL esté disponible
 const DATABASE_URL = process.env.DATABASE_URL;
